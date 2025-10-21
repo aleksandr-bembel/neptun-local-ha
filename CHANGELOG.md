@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.13] - 2025-10-21
+
+### Fixed
+- Fixed control commands to use exact working hex commands from real tests
+- Commands now use pre-calculated CRC values that are known to work
+- Removed custom CRC calculation that was causing command failures
+- All control commands now use verified working hex strings
+
 ## [2.1.12] - 2025-10-21
 
 ### Fixed
