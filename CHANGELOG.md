@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.1.2] - 2025-10-21
+
+### Fixed
+- Fixed HACS version detection issues
+- Updated hacs.json for proper version display
+
 ## [2.1.1] - 2025-10-21
 
 ### Fixed
