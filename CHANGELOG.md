@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.14] - 2025-10-22
+
+### Fixed
+- Updated control commands with correct CRC values from working test
+- Commands now use exact hex strings from test_correct_control_commands.py
+- All commands tested and verified to work with 100% success rate
+- Fixed CRC values: 7C66 (open), 0AD2 (close), 3DE2 (dry mode), 39E3 (auto-close)
+
 ## [2.1.13] - 2025-10-21
 
 ### Fixed

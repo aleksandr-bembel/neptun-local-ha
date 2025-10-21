@@ -491,13 +491,13 @@ class NeptunDevice:
     async def set_valve_state(self, open_valve: bool) -> bool:
         """Set valve state (open/close)."""
         try:
-            # Use exact working commands from control_commands_summary.json
+            # Use exact working commands from test_correct_control_commands.py
             if open_valve:
-                # Open valves: "0254515700075300040100000089A5"
-                command = bytes.fromhex("0254515700075300040100000089A5")
+                # Open valves: "025451570007530004010000007C66" (from working test)
+                command = bytes.fromhex("025451570007530004010000007C66")
             else:
-                # Close valves: "0254515700075300040000000032B9"
-                command = bytes.fromhex("0254515700075300040000000032B9")
+                # Close valves: "025451570007530004000000000AD2" (from working test)
+                command = bytes.fromhex("025451570007530004000000000AD2")
             
             _LOGGER.debug("Sending valve command: %s", command.hex().upper())
             response, attempts = await self.send_command_with_retries(command)
@@ -514,13 +514,13 @@ class NeptunDevice:
     async def set_dry_mode(self, dry_mode: bool) -> bool:
         """Set dry mode (cleaning mode)."""
         try:
-            # Use exact working commands from control_commands_summary.json
+            # Use exact working commands from test_correct_control_commands.py
             if dry_mode:
-                # Enable dry mode: "02545157000753000400010000EEE3"
-                command = bytes.fromhex("02545157000753000400010000EEE3")
+                # Enable dry mode: "025451570007530004000100003DE2" (from working test)
+                command = bytes.fromhex("025451570007530004000100003DE2")
             else:
-                # Disable dry mode: "0254515700075300040000000032B9"
-                command = bytes.fromhex("0254515700075300040000000032B9")
+                # Disable dry mode: "025451570007530004000000000AD2" (from working test)
+                command = bytes.fromhex("025451570007530004000000000AD2")
             
             _LOGGER.debug("Sending dry mode command: %s", command.hex().upper())
             response, attempts = await self.send_command_with_retries(command)
@@ -537,13 +537,13 @@ class NeptunDevice:
     async def set_auto_close(self, auto_close: bool) -> bool:
         """Set auto-close mode."""
         try:
-            # Use exact working commands from control_commands_summary.json
+            # Use exact working commands from test_correct_control_commands.py
             if auto_close:
-                # Enable auto-close: "02545157000753000400000100EAA0"
-                command = bytes.fromhex("02545157000753000400000100EAA0")
+                # Enable auto-close: "0254515700075300040000010039E3" (from working test)
+                command = bytes.fromhex("0254515700075300040000010039E3")
             else:
-                # Disable auto-close: "0254515700075300040000000032B9"
-                command = bytes.fromhex("0254515700075300040000000032B9")
+                # Disable auto-close: "025451570007530004000000000AD2" (from working test)
+                command = bytes.fromhex("025451570007530004000000000AD2")
             
             _LOGGER.debug("Sending auto-close command: %s", command.hex().upper())
             response, attempts = await self.send_command_with_retries(command)
