@@ -482,3 +482,108 @@ class NeptunDevice:
             "sw_version": "Unknown",
             "configuration_url": f"http://{self.host}",
         }
+
+    async def set_valve_state(self, open_valve: bool) -> bool:
+        """Set valve state (open/close)."""
+        try:
+            # Build control command based on protocol specification
+            # Header: 0x02 0x54 0x51 0x57
+            # Length: 0x00 0x07 (7 bytes of data)
+            # Data tag: 0x53 0x00 0x04
+            # Parameters: valve_state, dry_mode, auto_close, line_config
+            # CRC: calculated
+            
+            if open_valve:
+                # Open valves: 0x02 0x54 0x51 0x57 0x00 0x07 0x53 0x00 0x04 0x01 0x00 0x00 0x00 [CRC]
+                data = bytes([0x53, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00])
+            else:
+                # Close valves: 0x02 0x54 0x51 0x57 0x00 0x07 0x53 0x00 0x04 0x00 0x00 0x00 0x00 [CRC]
+                data = bytes([0x53, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00])
+            
+            # Calculate CRC16-CCITT for the data
+            crc = self._calculate_crc16_ccitt(data)
+            crc_bytes = crc.to_bytes(2, byteorder='little')
+            
+            # Build complete command
+            command = bytes([0x02, 0x54, 0x51, 0x57, 0x00, 0x07]) + data + crc_bytes
+            
+            response, attempts = await self.send_command_with_retries(command)
+            if response:
+                _LOGGER.info("Valve state command sent successfully")
+                return True
+            else:
+                _LOGGER.error("Failed to send valve state command")
+                return False
+        except Exception as err:
+            _LOGGER.error("Error setting valve state: %s", err)
+            return False
+
+    async def set_dry_mode(self, dry_mode: bool) -> bool:
+        """Set dry mode (cleaning mode)."""
+        try:
+            # Build control command based on protocol specification
+            # Header: 0x02 0x54 0x51 0x57
+            # Length: 0x00 0x07 (7 bytes of data)
+            # Data tag: 0x53 0x00 0x04
+            # Parameters: valve_state, dry_mode, auto_close, line_config
+            # CRC: calculated
+            
+            if dry_mode:
+                # Enable dry mode: 0x02 0x54 0x51 0x57 0x00 0x07 0x53 0x00 0x04 0x00 0x01 0x00 0x00 [CRC]
+                data = bytes([0x53, 0x00, 0x04, 0x00, 0x01, 0x00, 0x00])
+            else:
+                # Disable dry mode: 0x02 0x54 0x51 0x57 0x00 0x07 0x53 0x00 0x04 0x00 0x00 0x00 0x00 [CRC]
+                data = bytes([0x53, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00])
+            
+            # Calculate CRC16-CCITT for the data
+            crc = self._calculate_crc16_ccitt(data)
+            crc_bytes = crc.to_bytes(2, byteorder='little')
+            
+            # Build complete command
+            command = bytes([0x02, 0x54, 0x51, 0x57, 0x00, 0x07]) + data + crc_bytes
+            
+            response, attempts = await self.send_command_with_retries(command)
+            if response:
+                _LOGGER.info("Dry mode command sent successfully")
+                return True
+            else:
+                _LOGGER.error("Failed to send dry mode command")
+                return False
+        except Exception as err:
+            _LOGGER.error("Error setting dry mode: %s", err)
+            return False
+
+    async def set_auto_close(self, auto_close: bool) -> bool:
+        """Set auto-close mode."""
+        try:
+            # Build control command based on protocol specification
+            # Header: 0x02 0x54 0x51 0x57
+            # Length: 0x00 0x07 (7 bytes of data)
+            # Data tag: 0x53 0x00 0x04
+            # Parameters: valve_state, dry_mode, auto_close, line_config
+            # CRC: calculated
+            
+            if auto_close:
+                # Enable auto-close: 0x02 0x54 0x51 0x57 0x00 0x07 0x53 0x00 0x04 0x00 0x00 0x01 0x00 [CRC]
+                data = bytes([0x53, 0x00, 0x04, 0x00, 0x00, 0x01, 0x00])
+            else:
+                # Disable auto-close: 0x02 0x54 0x51 0x57 0x00 0x07 0x53 0x00 0x04 0x00 0x00 0x00 0x00 [CRC]
+                data = bytes([0x53, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00])
+            
+            # Calculate CRC16-CCITT for the data
+            crc = self._calculate_crc16_ccitt(data)
+            crc_bytes = crc.to_bytes(2, byteorder='little')
+            
+            # Build complete command
+            command = bytes([0x02, 0x54, 0x51, 0x57, 0x00, 0x07]) + data + crc_bytes
+            
+            response, attempts = await self.send_command_with_retries(command)
+            if response:
+                _LOGGER.info("Auto-close command sent successfully")
+                return True
+            else:
+                _LOGGER.error("Failed to send auto-close command")
+                return False
+        except Exception as err:
+            _LOGGER.error("Error setting auto-close mode: %s", err)
+            return False

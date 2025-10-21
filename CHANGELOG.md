@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.9] - 2025-10-21
+
+### Fixed
+- Fixed non-working switch buttons (Main Valve, Auto Close, Dry Mode)
+- Added missing control command methods in protocol.py
+- Implemented proper valve control commands based on protocol specification
+- Enhanced logging for switch operations
+
 ## [2.1.8] - 2025-10-21
 
 ### Fixed

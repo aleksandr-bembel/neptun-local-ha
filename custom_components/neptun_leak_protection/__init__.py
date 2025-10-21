@@ -104,10 +104,14 @@ class NeptunCoordinator(DataUpdateCoordinator):
     async def async_set_valve_state(self, open_valve: bool) -> bool:
         """Set valve state."""
         try:
+            _LOGGER.info("Setting valve state to %s", "open" if open_valve else "closed")
             success = await self.device.set_valve_state(open_valve)
             if success:
+                _LOGGER.info("Valve state set successfully, triggering update")
                 # Trigger immediate update
                 await self.async_request_refresh()
+            else:
+                _LOGGER.error("Failed to set valve state")
             return success
         except Exception as err:
             _LOGGER.error("Error setting valve state: %s", err)
@@ -116,10 +120,14 @@ class NeptunCoordinator(DataUpdateCoordinator):
     async def async_set_dry_mode(self, dry_mode: bool) -> bool:
         """Set dry mode."""
         try:
+            _LOGGER.info("Setting dry mode to %s", "enabled" if dry_mode else "disabled")
             success = await self.device.set_dry_mode(dry_mode)
             if success:
+                _LOGGER.info("Dry mode set successfully, triggering update")
                 # Trigger immediate update
                 await self.async_request_refresh()
+            else:
+                _LOGGER.error("Failed to set dry mode")
             return success
         except Exception as err:
             _LOGGER.error("Error setting dry mode: %s", err)
@@ -128,10 +136,14 @@ class NeptunCoordinator(DataUpdateCoordinator):
     async def async_set_auto_close(self, auto_close: bool) -> bool:
         """Set auto-close mode."""
         try:
+            _LOGGER.info("Setting auto-close mode to %s", "enabled" if auto_close else "disabled")
             success = await self.device.set_auto_close(auto_close)
             if success:
+                _LOGGER.info("Auto-close mode set successfully, triggering update")
                 # Trigger immediate update
                 await self.async_request_refresh()
+            else:
+                _LOGGER.error("Failed to set auto-close mode")
             return success
         except Exception as err:
             _LOGGER.error("Error setting auto-close mode: %s", err)
