@@ -7,6 +7,7 @@ from typing import Any, Dict, Optional
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -111,7 +112,7 @@ class NeptunDryModeSwitch(NeptunSwitchEntity):
         self._attr_name = "Dry Mode"
         self._attr_unique_id = f"{coordinator.device.host}_dry_mode"
         self._attr_icon = "mdi:broom"
-        self._attr_entity_category = ENTITY_CATEGORY_CONFIG
+        self._attr_entity_category = EntityCategory.CONFIG
 
     @property
     def is_on(self) -> bool:
@@ -156,7 +157,7 @@ class NeptunAutoCloseSwitch(NeptunSwitchEntity):
         self._attr_name = "Auto Close"
         self._attr_unique_id = f"{coordinator.device.host}_auto_close"
         self._attr_icon = "mdi:shield-alert"
-        self._attr_entity_category = ENTITY_CATEGORY_CONFIG
+        self._attr_entity_category = EntityCategory.CONFIG
 
     @property
     def is_on(self) -> bool:

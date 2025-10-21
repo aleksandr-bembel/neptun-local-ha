@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.5] - 2025-10-21
+
+### Fixed
+- Fixed EntityCategory validation errors
+- Updated sensor.py and switch.py to use proper EntityCategory instances
+- All entities should now load without validation errors
+
 ## [2.1.4] - 2025-10-21
 
 ### Fixed

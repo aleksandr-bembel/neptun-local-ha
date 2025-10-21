@@ -15,6 +15,7 @@ from homeassistant.const import (
     UnitOfVolume,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -209,7 +210,7 @@ class NeptunWirelessBatterySensor(NeptunSensorEntity):
         self._attr_device_class = SensorDeviceClass.BATTERY
         self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_native_unit_of_measurement = PERCENTAGE
-        self._attr_entity_category = ENTITY_CATEGORY_DIAGNOSTIC
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
         
         self._attr_name = f"Wireless Sensor {sensor_number} Battery"
         self._attr_unique_id = f"{coordinator.device.host}_sensor_{sensor_number}_battery"
@@ -258,7 +259,7 @@ class NeptunWirelessSignalSensor(NeptunSensorEntity):
         self._attr_device_class = SensorDeviceClass.SIGNAL_STRENGTH
         self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_native_unit_of_measurement = PERCENTAGE
-        self._attr_entity_category = ENTITY_CATEGORY_DIAGNOSTIC
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
         
         self._attr_name = f"Wireless Sensor {sensor_number} Signal"
         self._attr_unique_id = f"{coordinator.device.host}_sensor_{sensor_number}_signal"
