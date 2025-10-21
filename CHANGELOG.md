@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.3] - 2025-10-21
+
+### Fixed
+- Fixed critical device_info coroutine error
+- Fixed deprecated config_entry assignment
+- Fixed entity creation errors
+- All entities should now load properly
+
 ## [2.1.2] - 2025-10-21
 
 ### Fixed

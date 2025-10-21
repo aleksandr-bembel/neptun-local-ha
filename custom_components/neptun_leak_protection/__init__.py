@@ -90,7 +90,7 @@ class NeptunCoordinator(DataUpdateCoordinator):
             
             # Return combined data
             return {
-                "device_info": self.device.device_info,
+                "device_info": self.device.get_device_info_dict(),
                 "system_state": self.device.system_state,
                 "sensors": self.device.sensors,
                 "counters": self.device.counters,
