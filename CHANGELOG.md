@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.1.15] - 2025-10-22
+
+### Fixed
+- Fixed protocol implementation to match experimental documentation
+- Removed duplicate PACKET_DEVICE_INFO constant (only 0x52 command works)
+- Fixed TLV parsing according to protocol specification
+- Removed duplicate sensor battery field definitions
+- Added proper TLV structure parsing for device info, system state, and counters
+- Fixed system state parsing to use TLV tags instead of fixed positions
+
 ## [2.1.14] - 2025-10-22
 
 ### Fixed

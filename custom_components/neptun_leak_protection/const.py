@@ -26,8 +26,7 @@ DEFAULT_RETRY_DELAY: Final = 3.0  # Increased retry delay
 
 # Protocol constants
 PROTOCOL_HEADER: Final = bytes.fromhex("025451")
-PACKET_DEVICE_INFO: Final = 0x52
-PACKET_SYSTEM_STATE: Final = 0x52
+PACKET_SYSTEM_STATE: Final = 0x52  # Only working command - gets both device info and system state
 PACKET_SET_SYSTEM_STATE: Final = 0x57
 PACKET_SET_COUNTER_VALUE: Final = 0x58
 

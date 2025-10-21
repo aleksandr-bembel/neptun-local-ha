@@ -197,16 +197,11 @@ class NeptunDevice:
             return
         
         # Parse key bytes according to our analysis
+        # Parse TLV structure according to documentation
+        self._parse_tlv_data(data)
+        
+        # Parse sensor data according to experimental documentation
         self.system_state.update({
-            # Byte 41: Valve state (0x01 = open, 0x00 = closed)
-            "valve_open": data[41] == 0x01,
-            
-            # Byte 46: Operating mode (0x0F = dry mode, 0x00 = normal)
-            "dry_mode": data[46] == 0x0F,
-            
-            # Byte 47: Auto-close flag (0x08 = enabled, 0x00 = disabled)
-            "auto_close": data[47] == 0x08,
-            
             # Bytes 51, 55, 59: Sensor states (0x00=disconnected, 0x02=triggered, 0x03=normal)
             "sensor_1_state": data[51],
             "sensor_2_state": data[55], 
@@ -226,21 +221,6 @@ class NeptunDevice:
             "sensor_1_index": data[52],
             "sensor_2_index": data[56],
             "sensor_3_index": data[60],
-            
-            # Bytes 53, 57, 61: Battery levels (always 0x64 = 100%)
-            "sensor_1_battery": data[53],
-            "sensor_2_battery": data[57],
-            "sensor_3_battery": data[61],
-            
-            # Bytes 54, 58, 62: Sensor flags (0x00, 0x01)
-            "sensor_1_flag": data[54],
-            "sensor_2_flag": data[58],
-            "sensor_3_flag": data[62],
-            
-            # Bytes 66-68: Counter data (0x00, 0x02)
-            "counter_1_data": data[66],
-            "counter_2_data": data[67],
-            "counter_3_data": data[68],
         })
         
         # Parse sensor information
@@ -250,6 +230,100 @@ class NeptunDevice:
         self._parse_counter_data()
         
         self.last_update = datetime.now()
+
+    def _parse_tlv_data(self, data: bytes) -> None:
+        """Parse TLV structure according to documentation."""
+        try:
+            # Parse TLV tags according to documentation
+            pos = 0
+            while pos < len(data) - 2:
+                if pos + 2 > len(data):
+                    break
+                    
+                tag = data[pos]
+                length = data[pos + 1]
+                
+                if pos + 2 + length > len(data):
+                    break
+                    
+                value = data[pos + 2:pos + 2 + length]
+                
+                # Parse known TLV tags
+                if tag == 0x49 and length == 5:  # Device type
+                    device_type = value.decode('ascii', errors='ignore')
+                    self.device_info.update({
+                        "model": device_type,
+                        "manufacturer": "Neptun"
+                    })
+                    
+                elif tag == 0x4D and length == 17:  # MAC address
+                    mac_bytes = value[1:7]  # Skip first byte
+                    mac_address = ':'.join(f'{b:02X}' for b in mac_bytes)
+                    self.device_info.update({
+                        "mac_address": mac_address
+                    })
+                    
+                elif tag == 0x53 and length == 7:  # System state
+                    # Parse system state according to documentation
+                    valve_open = bool(value[0] & 0x01)
+                    wireless_sensors = value[1]
+                    relay_count = value[2]
+                    dry_mode = bool(value[3] & 0x01)
+                    close_valve_on_offline = bool(value[4] & 0x01)
+                    line_config = value[5]
+                    system_status = value[6]
+                    
+                    self.system_state.update({
+                        "valve_open": valve_open,
+                        "wireless_sensors": wireless_sensors,
+                        "relay_count": relay_count,
+                        "dry_mode": dry_mode,
+                        "auto_close": close_valve_on_offline,
+                        "line_config": line_config,
+                        "system_status": system_status
+                    })
+                    
+                elif tag == 0x73 and length == 12:  # Line data
+                    # Parse line data (4 lines, 3 bytes each)
+                    for i in range(4):
+                        line_start = i * 3
+                        if line_start + 2 < len(value):
+                            line_type = value[line_start]
+                            line_num = value[line_start + 1]
+                            line_val = value[line_start + 2]
+                            
+                            self.system_state[f"line_{i+1}_type"] = line_type
+                            self.system_state[f"line_{i+1}_num"] = line_num
+                            self.system_state[f"line_{i+1}_val"] = line_val
+                            
+                elif tag == 0x4C and length == 4:  # Additional flags
+                    if len(value) >= 3:
+                        flags = value[2]
+                        self.system_state["additional_flags"] = flags
+                        
+                elif tag == 0x43 and length == 20:  # Counter values
+                    # Parse counter values (4 counters, 5 bytes each)
+                    for i in range(4):
+                        counter_start = i * 5
+                        if counter_start + 4 < len(value):
+                            counter_value = struct.unpack('<I', value[counter_start:counter_start+4])[0]
+                            multiplier = value[counter_start + 4]
+                            
+                            self.system_state[f"counter_{i+1}_value"] = counter_value
+                            self.system_state[f"counter_{i+1}_multiplier"] = multiplier
+                            
+                elif tag == 0x44 and length == 10:  # Timestamp
+                    try:
+                        timestamp_str = value.decode('ascii', errors='ignore')
+                        timestamp = int(timestamp_str)
+                        self.system_state["timestamp"] = timestamp
+                    except (ValueError, UnicodeDecodeError):
+                        pass
+                        
+                pos += 2 + length
+                
+        except Exception as e:
+            _LOGGER.warning("Error parsing TLV data: %s", e)
 
     def _parse_sensor_data(self) -> None:
         """Parse sensor data from system state."""
@@ -295,23 +369,9 @@ class NeptunDevice:
             }
 
     async def get_device_info(self) -> bool:
-        """Get device information."""
-        async with self._lock:
-            command = create_command(PACKET_DEVICE_INFO)
-            response, attempts = await self.send_command_with_retries(command)
-            
-            if not response:
-                _LOGGER.error("Failed to get device info after %d attempts", attempts)
-                return False
-            
-            # Parse device info (basic implementation)
-            self.device_info.update({
-                "host": self.host,
-                "port": self.port,
-                "last_update": datetime.now()
-            })
-            
-            return True
+        """Get device information (same as system state - command 0x52 returns both)."""
+        # Command 0x52 returns both device info and system state
+        return await self.get_system_state()
 
     async def get_system_state(self) -> bool:
         """Get system state."""
