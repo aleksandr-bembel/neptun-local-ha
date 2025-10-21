@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.11] - 2025-10-21
+
+### Fixed
+- Fixed control command structure to match working examples
+- Corrected data length from 7 to 6 bytes in control commands
+- Added debug logging for sent commands
+- Commands now use proper structure from control_commands_summary.json
+
 ## [2.1.10] - 2025-10-21
 
 ### Fixed

@@ -490,27 +490,24 @@ class NeptunDevice:
     async def set_valve_state(self, open_valve: bool) -> bool:
         """Set valve state (open/close)."""
         try:
-            # Build control command based on protocol specification
-            # Header: 0x02 0x54 0x51 0x57
-            # Length: 0x00 0x07 (7 bytes of data)
-            # Data tag: 0x53 0x00 0x04
-            # Parameters: valve_state, dry_mode, auto_close, line_config
-            # CRC: calculated
+            # Build control command based on working examples from control_commands_summary.json
+            # Working command structure: 0x02 0x54 0x51 0x57 0x00 0x06 0x53 0x00 0x04 0x01 0x00 0x00 [CRC]
             
             if open_valve:
-                # Open valves: 0x02 0x54 0x51 0x57 0x00 0x07 0x53 0x00 0x04 0x01 0x00 0x00 0x00 [CRC]
-                data = bytes([0x53, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00])
+                # Open valves: data = "53000401000000" (6 bytes)
+                data = bytes([0x53, 0x00, 0x04, 0x01, 0x00, 0x00])
             else:
-                # Close valves: 0x02 0x54 0x51 0x57 0x00 0x07 0x53 0x00 0x04 0x00 0x00 0x00 0x00 [CRC]
-                data = bytes([0x53, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00])
+                # Close valves: data = "53000400000000" (6 bytes)
+                data = bytes([0x53, 0x00, 0x04, 0x00, 0x00, 0x00])
             
             # Calculate CRC16-CCITT for the data
             crc = self._calculate_crc16_ccitt(data)
             crc_bytes = crc.to_bytes(2, byteorder='little')
             
-            # Build complete command
-            command = bytes([0x02, 0x54, 0x51, 0x57, 0x00, 0x07]) + data + crc_bytes
+            # Build complete command with correct length (6 bytes)
+            command = bytes([0x02, 0x54, 0x51, 0x57, 0x00, 0x06]) + data + crc_bytes
             
+            _LOGGER.debug("Sending valve command: %s", command.hex().upper())
             response, attempts = await self.send_command_with_retries(command)
             if response:
                 _LOGGER.info("Valve state command sent successfully")
@@ -525,27 +522,24 @@ class NeptunDevice:
     async def set_dry_mode(self, dry_mode: bool) -> bool:
         """Set dry mode (cleaning mode)."""
         try:
-            # Build control command based on protocol specification
-            # Header: 0x02 0x54 0x51 0x57
-            # Length: 0x00 0x07 (7 bytes of data)
-            # Data tag: 0x53 0x00 0x04
-            # Parameters: valve_state, dry_mode, auto_close, line_config
-            # CRC: calculated
+            # Build control command based on working examples from control_commands_summary.json
+            # Working command structure: 0x02 0x54 0x51 0x57 0x00 0x06 0x53 0x00 0x04 0x00 0x01 0x00 [CRC]
             
             if dry_mode:
-                # Enable dry mode: 0x02 0x54 0x51 0x57 0x00 0x07 0x53 0x00 0x04 0x00 0x01 0x00 0x00 [CRC]
-                data = bytes([0x53, 0x00, 0x04, 0x00, 0x01, 0x00, 0x00])
+                # Enable dry mode: data = "53000400010000" (6 bytes)
+                data = bytes([0x53, 0x00, 0x04, 0x00, 0x01, 0x00])
             else:
-                # Disable dry mode: 0x02 0x54 0x51 0x57 0x00 0x07 0x53 0x00 0x04 0x00 0x00 0x00 0x00 [CRC]
-                data = bytes([0x53, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00])
+                # Disable dry mode: data = "53000400000000" (6 bytes)
+                data = bytes([0x53, 0x00, 0x04, 0x00, 0x00, 0x00])
             
             # Calculate CRC16-CCITT for the data
             crc = self._calculate_crc16_ccitt(data)
             crc_bytes = crc.to_bytes(2, byteorder='little')
             
-            # Build complete command
-            command = bytes([0x02, 0x54, 0x51, 0x57, 0x00, 0x07]) + data + crc_bytes
+            # Build complete command with correct length (6 bytes)
+            command = bytes([0x02, 0x54, 0x51, 0x57, 0x00, 0x06]) + data + crc_bytes
             
+            _LOGGER.debug("Sending dry mode command: %s", command.hex().upper())
             response, attempts = await self.send_command_with_retries(command)
             if response:
                 _LOGGER.info("Dry mode command sent successfully")
@@ -560,27 +554,24 @@ class NeptunDevice:
     async def set_auto_close(self, auto_close: bool) -> bool:
         """Set auto-close mode."""
         try:
-            # Build control command based on protocol specification
-            # Header: 0x02 0x54 0x51 0x57
-            # Length: 0x00 0x07 (7 bytes of data)
-            # Data tag: 0x53 0x00 0x04
-            # Parameters: valve_state, dry_mode, auto_close, line_config
-            # CRC: calculated
+            # Build control command based on working examples from control_commands_summary.json
+            # Working command structure: 0x02 0x54 0x51 0x57 0x00 0x06 0x53 0x00 0x04 0x00 0x00 0x01 [CRC]
             
             if auto_close:
-                # Enable auto-close: 0x02 0x54 0x51 0x57 0x00 0x07 0x53 0x00 0x04 0x00 0x00 0x01 0x00 [CRC]
-                data = bytes([0x53, 0x00, 0x04, 0x00, 0x00, 0x01, 0x00])
+                # Enable auto-close: data = "53000400000100" (6 bytes)
+                data = bytes([0x53, 0x00, 0x04, 0x00, 0x00, 0x01])
             else:
-                # Disable auto-close: 0x02 0x54 0x51 0x57 0x00 0x07 0x53 0x00 0x04 0x00 0x00 0x00 0x00 [CRC]
-                data = bytes([0x53, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00])
+                # Disable auto-close: data = "53000400000000" (6 bytes)
+                data = bytes([0x53, 0x00, 0x04, 0x00, 0x00, 0x00])
             
             # Calculate CRC16-CCITT for the data
             crc = self._calculate_crc16_ccitt(data)
             crc_bytes = crc.to_bytes(2, byteorder='little')
             
-            # Build complete command
-            command = bytes([0x02, 0x54, 0x51, 0x57, 0x00, 0x07]) + data + crc_bytes
+            # Build complete command with correct length (6 bytes)
+            command = bytes([0x02, 0x54, 0x51, 0x57, 0x00, 0x06]) + data + crc_bytes
             
+            _LOGGER.debug("Sending auto-close command: %s", command.hex().upper())
             response, attempts = await self.send_command_with_retries(command)
             if response:
                 _LOGGER.info("Auto-close command sent successfully")
