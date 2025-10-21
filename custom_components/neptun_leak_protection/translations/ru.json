@@ -1,0 +1,74 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Настройка защиты от протечек Neptun",
+        "description": "Настройте ваше устройство защиты от протечек Neptun (совместимо с Equation)",
+        "data": {
+          "host": "IP-адрес",
+          "port": "Порт",
+          "scan_interval": "Интервал обновления (секунды)",
+          "discovery": "Включить автообнаружение"
+        }
+      },
+      "zeroconf_confirm": {
+        "title": "Подтвердите обнаруженное устройство",
+        "description": "Хотите ли вы настроить {name} по адресу {host}?"
+      }
+    },
+    "error": {
+      "cannot_connect": "Не удалось подключиться к устройству",
+      "timeout": "Таймаут подключения",
+      "invalid_host": "Неверное имя хоста или IP-адрес",
+      "unknown": "Произошла неожиданная ошибка"
+    },
+    "abort": {
+      "already_configured": "Устройство уже настроено",
+      "cannot_connect": "Не удалось подключиться к устройству",
+      "invalid_discovery_info": "Неверная информация об обнаружении"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Настройки защиты от протечек Neptun",
+        "data": {
+          "scan_interval": "Интервал обновления (секунды)",
+          "discovery": "Включить автообнаружение"
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "system_alarm": {
+        "name": "Системная тревога"
+      },
+      "leak_sensor": {
+        "name": "Датчик протечки"
+      },
+      "battery_low": {
+        "name": "Низкий заряд батареи"
+      }
+    },
+    "sensor": {
+      "water_counter": {
+        "name": "Счетчик воды"
+      },
+      "battery_level": {
+        "name": "Уровень батареи"
+      },
+      "signal_strength": {
+        "name": "Уровень сигнала"
+      }
+    },
+    "switch": {
+      "main_valve": {
+        "name": "Главный клапан"
+      },
+      "dry_mode": {
+        "name": "Режим сухого хода"
+      }
+    }
+  }
+}

@@ -1,0 +1,212 @@
+# Примеры автоматизаций для Neptun Leak Protection
+
+# Автоматизация: Закрытие клапана при обнаружении протечки
+automation:
+  - alias: "Закрыть клапан при протечке"
+    description: "Автоматически закрывает главный клапан при обнаружении протечки любым датчиком"
+    trigger:
+      - platform: state
+        entity_id: 
+          - binary_sensor.neptun_device_wireless_sensor_1_leak
+          - binary_sensor.neptun_device_wireless_sensor_2_leak
+          - binary_sensor.neptun_device_wireless_sensor_3_leak
+        to: "on"
+    condition:
+      # Проверяем, что не включен режим сухого хода
+      - condition: state
+        entity_id: switch.neptun_device_dry_mode
+        state: "off"
+    action:
+      - service: switch.turn_off
+        target:
+          entity_id: switch.neptun_device_valve
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "🚨 ПРОТЕЧКА ВОДЫ!"
+          message: "Обнаружена протечка! Клапан автоматически закрыт."
+          data:
+            priority: high
+            ttl: 0
+
+  # Автоматизация: Уведомление о низком заряде батареи
+  - alias: "Уведомление о низком заряде батареи датчика"
+    description: "Отправляет уведомление когда заряд батареи беспроводного датчика становится низким"
+    trigger:
+      - platform: numeric_state
+        entity_id: 
+          - sensor.neptun_device_wireless_sensor_1_battery
+          - sensor.neptun_device_wireless_sensor_2_battery
+          - sensor.neptun_device_wireless_sensor_3_battery
+        below: 20
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "🔋 Низкий заряд батареи"
+          message: "Заряд батареи датчика {{ trigger.to_state.attributes.friendly_name }} составляет {{ trigger.to_state.state }}%"
+
+  # Автоматизация: Еженедельная проверка системы
+  - alias: "Еженедельная проверка системы защиты"
+    description: "Еженедельно проверяет состояние системы и отправляет отчет"
+    trigger:
+      - platform: time
+        at: "09:00:00"
+      - platform: time
+        at: "09:00:00"
+    condition:
+      - condition: time
+        weekday:
+          - sun
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "📊 Еженедельный отчет системы защиты"
+          message: >
+            Клапан: {{ states('switch.equation_device_192_168_1_100_valve') }}
+            Система: {{ states('binary_sensor.equation_device_192_168_1_100_alarm') }}
+            Счетчик: {{ states('sensor.equation_device_192_168_1_100_line_0_water') }} м³
+
+  # Автоматизация: Автоматическое включение сухого режима
+  - alias: "Автоматический сухой режим при уборке"
+    description: "Включает режим сухого хода когда начинается уборка"
+    trigger:
+      - platform: state
+        entity_id: input_boolean.cleaning_mode
+        to: "on"
+    action:
+      - service: switch.turn_on
+        target:
+          entity_id: switch.equation_device_192_168_1_100_dry_mode
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "🧽 Режим уборки"
+          message: "Включен режим сухого хода. Датчики протечки временно отключены."
+
+  # Автоматизация: Отключение сухого режима
+  - alias: "Отключение сухого режима после уборки"
+    description: "Отключает режим сухого хода после завершения уборки"
+    trigger:
+      - platform: state
+        entity_id: input_boolean.cleaning_mode
+        to: "off"
+        for: "00:05:00"  # 5 минут задержки
+    action:
+      - service: switch.turn_off
+        target:
+          entity_id: switch.equation_device_192_168_1_100_dry_mode
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "✅ Режим уборки завершен"
+          message: "Режим сухого хода отключен. Система защиты активна."
+
+# Дополнительные сенсоры и шаблоны
+template:
+  # Шаблон для отображения общего статуса системы
+  - binary_sensor:
+      - name: "Система защиты активна"
+        unique_id: equation_protection_active
+        state: >
+          {{ is_state('switch.equation_device_192_168_1_100_valve', 'on') and
+             is_state('binary_sensor.equation_device_192_168_1_100_alarm', 'off') }}
+        icon: >
+          {% if is_state('binary_sensor.equation_protection_active', 'on') %}
+            mdi:shield-check
+          {% else %}
+            mdi:shield-alert
+          {% endif %}
+
+  # Шаблон для подсчета активных датчиков протечки
+  - sensor:
+      - name: "Количество активных датчиков протечки"
+        unique_id: equation_active_leak_sensors
+        state: >
+          {% set leak_sensors = [
+            'binary_sensor.equation_device_192_168_1_100_line_0_leak',
+            'binary_sensor.equation_device_192_168_1_100_line_1_leak',
+            'binary_sensor.equation_device_192_168_1_100_wireless_4_leak'
+          ] %}
+          {{ leak_sensors | select('is_state', 'on') | list | count }}
+        icon: mdi:water-alert
+
+  # Шаблон для расчета общего потребления воды за месяц
+  - sensor:
+      - name: "Потребление воды за месяц"
+        unique_id: equation_monthly_water_usage
+        state: >
+          {% set current = states('sensor.equation_device_192_168_1_100_line_0_water') | float(0) %}
+          {% set last_month = state_attr('sensor.equation_monthly_water_usage', 'last_month_value') | float(current) %}
+          {{ (current - last_month) | round(2) }}
+        unit_of_measurement: "m³"
+        device_class: water
+        state_class: measurement
+        attributes:
+          last_month_value: >
+            {% if now().day == 1 %}
+              {{ states('sensor.equation_device_192_168_1_100_line_0_water') | float(0) }}
+            {% else %}
+              {{ state_attr('sensor.equation_monthly_water_usage', 'last_month_value') | float(0) }}
+            {% endif %}
+
+# Группы для организации сущностей
+group:
+  equation_leak_protection:
+    name: "Защита от протечек"
+    icon: mdi:water-pump
+    entities:
+      - switch.equation_device_192_168_1_100_valve
+      - switch.equation_device_192_168_1_100_dry_mode
+      - binary_sensor.equation_device_192_168_1_100_alarm
+      - binary_sensor.equation_protection_active
+
+  equation_leak_sensors:
+    name: "Датчики протечки"
+    icon: mdi:water-alert
+    entities:
+      - binary_sensor.equation_device_192_168_1_100_line_0_leak
+      - binary_sensor.equation_device_192_168_1_100_line_1_leak
+      - binary_sensor.equation_device_192_168_1_100_wireless_4_leak
+
+  equation_water_counters:
+    name: "Счетчики воды"
+    icon: mdi:counter
+    entities:
+      - sensor.equation_device_192_168_1_100_line_0_water
+      - sensor.equation_monthly_water_usage
+
+  equation_wireless_diagnostics:
+    name: "Диагностика беспроводных датчиков"
+    icon: mdi:wifi
+    entities:
+      - sensor.equation_device_192_168_1_100_wireless_4_battery
+      - sensor.equation_device_192_168_1_100_wireless_4_signal
+
+# Скрипты для быстрых действий
+script:
+  equation_emergency_shutdown:
+    alias: "Экстренное отключение воды"
+    description: "Немедленно закрывает клапан и отправляет уведомление"
+    sequence:
+      - service: switch.turn_off
+        target:
+          entity_id: switch.equation_device_192_168_1_100_valve
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "🚨 Экстренное отключение"
+          message: "Водяной клапан закрыт вручную"
+
+  equation_system_check:
+    alias: "Проверка системы"
+    description: "Выполняет проверку всех компонентов системы"
+    sequence:
+      - service: homeassistant.update_entity
+        target:
+          entity_id: 
+            - switch.equation_device_192_168_1_100_valve
+            - binary_sensor.equation_device_192_168_1_100_alarm
+      - delay: "00:00:02"
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "🔍 Проверка системы"
+          message: >
+            Статус: {% if is_state('binary_sensor.equation_protection_active', 'on') %}Активна{% else %}Требует внимания{% endif %}
+            Клапан: {{ states('switch.equation_device_192_168_1_100_valve') }}
+            Тревога: {{ states('binary_sensor.equation_device_192_168_1_100_alarm') }}

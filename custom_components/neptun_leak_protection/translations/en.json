@@ -1,0 +1,74 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Neptun Leak Protection Setup",
+        "description": "Configure your Neptun leak protection device (Equation compatible)",
+        "data": {
+          "host": "IP Address",
+          "port": "Port",
+          "scan_interval": "Update interval (seconds)",
+          "discovery": "Enable auto-discovery"
+        }
+      },
+      "zeroconf_confirm": {
+        "title": "Confirm discovered device",
+        "description": "Do you want to set up {name} at {host}?"
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to device",
+      "timeout": "Connection timeout",
+      "invalid_host": "Invalid hostname or IP address",
+      "unknown": "Unexpected error occurred"
+    },
+    "abort": {
+      "already_configured": "Device is already configured",
+      "cannot_connect": "Failed to connect to device",
+      "invalid_discovery_info": "Invalid discovery information"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Neptun Leak Protection Options",
+        "data": {
+          "scan_interval": "Update interval (seconds)",
+          "discovery": "Enable auto-discovery"
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "system_alarm": {
+        "name": "System Alarm"
+      },
+      "leak_sensor": {
+        "name": "Leak Sensor"
+      },
+      "battery_low": {
+        "name": "Battery Low"
+      }
+    },
+    "sensor": {
+      "water_counter": {
+        "name": "Water Counter"
+      },
+      "battery_level": {
+        "name": "Battery Level"
+      },
+      "signal_strength": {
+        "name": "Signal Strength"
+      }
+    },
+    "switch": {
+      "main_valve": {
+        "name": "Main Valve"
+      },
+      "dry_mode": {
+        "name": "Dry Mode"
+      }
+    }
+  }
+}
