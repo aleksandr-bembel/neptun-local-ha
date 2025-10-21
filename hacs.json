@@ -1,9 +1,10 @@
 {
   "name": "Neptun Leak Protection",
   "content_in_root": false,
-  "filename": "neptun_leak_protection.zip",
+  "filename": "neptun_leak_protection",
   "country": ["RU", "BY", "KZ", "UA"],
   "homeassistant": "2023.1.0",
   "render_readme": true,
-  "iot_class": "Local Polling"
+  "iot_class": "Local Polling",
+  "version": "2.1.1"
 }
