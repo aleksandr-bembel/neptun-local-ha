@@ -67,7 +67,7 @@ class NeptunSensorEntity(CoordinatorEntity, SensorEntity):
     @property
     def device_info(self) -> Dict[str, Any]:
         """Return device information."""
-        return self.coordinator.device.get_device_info()
+        return self.coordinator.device.get_device_info_dict()
 
     @property
     def available(self) -> bool:

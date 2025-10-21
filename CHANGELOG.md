@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.4] - 2025-10-21
+
+### Fixed
+- Fixed device_info coroutine error in all entity files
+- Fixed sensor.py, switch.py, binary_sensor.py device_info methods
+- All entities should now load without coroutine errors
+
 ## [2.1.3] - 2025-10-21
 
 ### Fixed
