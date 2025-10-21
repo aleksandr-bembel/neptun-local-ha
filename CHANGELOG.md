@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.16] - 2025-10-22
+
+### Fixed
+- Fixed import error: removed PACKET_DEVICE_INFO from protocol.py imports
+- Integration now starts without import errors
+- Fixed critical startup issue that prevented integration from loading
+
 ## [2.1.15] - 2025-10-22
 
 ### Fixed
