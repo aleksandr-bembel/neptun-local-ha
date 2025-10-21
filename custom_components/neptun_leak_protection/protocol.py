@@ -473,8 +473,9 @@ class NeptunDevice:
         if self.last_update is None:
             return False
         
-        # Consider device offline if no update in the last 5 minutes
-        return (datetime.now() - self.last_update).total_seconds() < 300
+        # Consider device offline if no update in the last 10 minutes
+        # This gives more time for the device to recover from temporary issues
+        return (datetime.now() - self.last_update).total_seconds() < 600
 
     def get_device_info_dict(self) -> Dict[str, Any]:
         """Get device information for Home Assistant."""

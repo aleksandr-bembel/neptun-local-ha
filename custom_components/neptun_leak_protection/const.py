@@ -14,15 +14,15 @@ CONF_DISCOVERY: Final = "discovery"
 
 # Default values
 DEFAULT_PORT: Final = 6350
-DEFAULT_SCAN_INTERVAL: Final = 60
-DEFAULT_TIMEOUT: Final = 10
-DEFAULT_PRE_CONNECT_DELAY: Final = 0.1
-DEFAULT_POST_SEND_DELAY: Final = 0.1
-DEFAULT_RECEIVE_TIMEOUT: Final = 15.0
-DEFAULT_CONNECTION_TIMEOUT: Final = 10.0
-DEFAULT_VALVE_OPERATION_DELAY: Final = 15.0
-DEFAULT_RETRY_ATTEMPTS: Final = 3
-DEFAULT_RETRY_DELAY: Final = 2.0
+DEFAULT_SCAN_INTERVAL: Final = 120  # Increased to 2 minutes for stability
+DEFAULT_TIMEOUT: Final = 20  # Increased timeout
+DEFAULT_PRE_CONNECT_DELAY: Final = 0.5  # Increased delay for stability
+DEFAULT_POST_SEND_DELAY: Final = 0.2  # Increased delay
+DEFAULT_RECEIVE_TIMEOUT: Final = 20.0  # Increased receive timeout
+DEFAULT_CONNECTION_TIMEOUT: Final = 15.0  # Increased connection timeout
+DEFAULT_VALVE_OPERATION_DELAY: Final = 20.0  # Increased valve operation delay
+DEFAULT_RETRY_ATTEMPTS: Final = 5  # Increased retry attempts
+DEFAULT_RETRY_DELAY: Final = 3.0  # Increased retry delay
 
 # Protocol constants
 PROTOCOL_HEADER: Final = bytes.fromhex("025451")

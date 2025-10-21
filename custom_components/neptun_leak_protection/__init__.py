@@ -81,12 +81,22 @@ class NeptunCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self) -> dict:
         """Fetch data from device."""
         try:
+            _LOGGER.debug("Attempting to update device data")
             success = await self.device.update_all()
             if not success:
+                _LOGGER.warning("Device update failed, marking as unavailable")
                 self._available = False
-                raise UpdateFailed("Failed to communicate with device")
+                # Don't raise UpdateFailed immediately, return empty data instead
+                return {
+                    "device_info": self.device.get_device_info_dict(),
+                    "system_state": {},
+                    "sensors": {},
+                    "counters": {},
+                    "last_update": None,
+                }
             
             self._available = True
+            _LOGGER.debug("Device update successful")
             
             # Return combined data
             return {
@@ -98,8 +108,16 @@ class NeptunCoordinator(DataUpdateCoordinator):
             }
             
         except Exception as err:
+            _LOGGER.error("Error communicating with device: %s", err)
             self._available = False
-            raise UpdateFailed(f"Error communicating with device: {err}")
+            # Return empty data instead of raising UpdateFailed
+            return {
+                "device_info": self.device.get_device_info_dict(),
+                "system_state": {},
+                "sensors": {},
+                "counters": {},
+                "last_update": None,
+            }
 
     async def async_set_valve_state(self, open_valve: bool) -> bool:
         """Set valve state."""

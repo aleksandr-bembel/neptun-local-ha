@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.1.12] - 2025-10-21
+
+### Fixed
+- Improved connection stability after HA restart
+- Increased all timeouts for better reliability
+- Added graceful error handling to prevent integration failures
+- Increased scan interval to 2 minutes for stability
+- Extended device online timeout to 10 minutes
+
 ## [2.1.11] - 2025-10-21
 
 ### Fixed
