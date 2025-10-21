@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.7] - 2025-10-21
+
+### Fixed
+- Increased connection and receive timeouts for better stability
+- Increased default scan interval from 30 to 60 seconds
+- Improved connection reliability with slower devices
+
 ## [2.1.6] - 2025-10-21
 
 ### Fixed
