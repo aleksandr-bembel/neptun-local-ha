@@ -54,10 +54,10 @@ async def validate_input(hass: HomeAssistant, data: Dict[str, Any]) -> Dict[str,
             raise ValueError("Cannot connect to device")
         
         # Get device info for unique ID
-        device_info = device.get_device_info()
+        device_info = device.get_device_info_dict()
         
         return {
-            "title": device_info.get("name", f"Equation Device {host}"),
+            "title": device_info.get("name", f"Neptun Device {host}"),
             "device_info": device_info,
             "host": host,
             "port": port,

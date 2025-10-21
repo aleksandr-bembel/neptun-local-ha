@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.1.1] - 2025-10-21
+
+### Fixed
+- Fixed config flow error with async method call
+- Fixed device info retrieval in configuration
+
 ## [2.0.0] - 2025-09-24
 
 ### Added
