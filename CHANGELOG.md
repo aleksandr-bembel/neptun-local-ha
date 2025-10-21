@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.10] - 2025-10-21
+
+### Fixed
+- Fixed missing _calculate_crc16_ccitt method in NeptunDevice class
+- Switch buttons now work correctly (Main Valve, Auto Close, Dry Mode)
+- Added proper CRC16-CCITT calculation for control commands
+
 ## [2.1.9] - 2025-10-21
 
 ### Fixed

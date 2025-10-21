@@ -117,6 +117,10 @@ class NeptunDevice:
         self.last_update: Optional[datetime] = None
         self._lock = asyncio.Lock()
 
+    def _calculate_crc16_ccitt(self, data: bytes) -> int:
+        """Calculate CRC16-CCITT checksum for data."""
+        return crc16(data)[0] << 8 | crc16(data)[1]
+
     async def send_command_with_retries(
         self, 
         command: bytes, 
