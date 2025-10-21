@@ -127,18 +127,21 @@ class NeptunDevice:
         """Send command with retry logic."""
         for attempt in range(max_retries):
             try:
+                _LOGGER.debug("Sending command to %s:%d (attempt %d/%d)", self.host, self.port, attempt + 1, max_retries)
                 response = await self._send_command(command, timeout)
                 if response:
+                    _LOGGER.debug("Command successful on attempt %d, received %d bytes", attempt + 1, len(response))
                     return response, attempt + 1
                 
+                _LOGGER.warning("Command returned no response on attempt %d/%d", attempt + 1, max_retries)
                 if attempt < max_retries - 1:
-                    _LOGGER.debug("Command failed, retrying in %s seconds (attempt %d/%d)", 
-                                retry_delay, attempt + 1, max_retries)
+                    _LOGGER.debug("Retrying in %s seconds", retry_delay)
                     await asyncio.sleep(retry_delay)
                     
             except Exception as e:
-                _LOGGER.error("Command failed on attempt %d: %s", attempt + 1, e)
+                _LOGGER.error("Command failed on attempt %d/%d: %s", attempt + 1, max_retries, e)
                 if attempt < max_retries - 1:
+                    _LOGGER.debug("Retrying in %s seconds", retry_delay)
                     await asyncio.sleep(retry_delay)
         
         return None, max_retries
@@ -149,10 +152,12 @@ class NeptunDevice:
             # Pre-connect delay for stability
             await asyncio.sleep(DEFAULT_PRE_CONNECT_DELAY)
             
+            _LOGGER.debug("Connecting to %s:%d with timeout %s", self.host, self.port, DEFAULT_CONNECTION_TIMEOUT)
             reader, writer = await asyncio.wait_for(
                 asyncio.open_connection(self.host, self.port),
                 timeout=DEFAULT_CONNECTION_TIMEOUT
             )
+            _LOGGER.debug("Connected successfully, sending %d bytes", len(command))
             
             writer.write(command)
             await writer.drain()
@@ -171,8 +176,14 @@ class NeptunDevice:
             
             return response
             
-        except (asyncio.TimeoutError, OSError) as err:
-            _LOGGER.error("Failed to communicate with device %s: %s", self.host, err)
+        except asyncio.TimeoutError as err:
+            _LOGGER.error("Timeout communicating with device %s:%d - %s", self.host, self.port, err)
+            return None
+        except OSError as err:
+            _LOGGER.error("Network error communicating with device %s:%d - %s (errno: %s)", self.host, self.port, err, getattr(err, 'errno', 'unknown'))
+            return None
+        except Exception as err:
+            _LOGGER.error("Unexpected error communicating with device %s:%d - %s", self.host, self.port, err)
             return None
 
     def _parse_system_state(self, data: bytes) -> None:

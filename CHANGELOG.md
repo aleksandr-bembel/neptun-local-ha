@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.8] - 2025-10-21
+
+### Fixed
+- Enhanced error logging for better debugging
+- Added detailed connection attempt logging
+- Improved error messages with specific error types and errno
+
 ## [2.1.7] - 2025-10-21
 
 ### Fixed
