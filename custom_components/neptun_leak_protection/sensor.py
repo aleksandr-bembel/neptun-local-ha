@@ -250,23 +250,23 @@ class NeptunWirelessBatterySensor(NeptunSensorEntity):
 
 
 class NeptunWirelessSignalSensor(NeptunSensorEntity):
-    """Wireless sensor signal strength."""
+    """Wireless sensor signal state (0=no signal, 1=good signal)."""
 
     def __init__(self, coordinator: NeptunCoordinator, sensor_number: int) -> None:
         """Initialize the signal sensor."""
         super().__init__(coordinator, f"sensor_{sensor_number}_signal")
         self._sensor_number = sensor_number
-        self._attr_device_class = SensorDeviceClass.SIGNAL_STRENGTH
+        # No device_class for signal state (0/1)
         self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = PERCENTAGE
+        # No unit of measurement for signal state
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
         
-        self._attr_name = f"Wireless Sensor {sensor_number} Signal"
+        self._attr_name = f"Wireless Sensor {sensor_number} Signal State"
         self._attr_unique_id = f"{coordinator.device.host}_sensor_{sensor_number}_signal"
 
     @property
     def native_value(self) -> Optional[int]:
-        """Return the signal strength."""
+        """Return the signal state (0=no signal, 1=good signal)."""
         if not self.coordinator.data:
             return None
         

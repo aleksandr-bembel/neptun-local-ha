@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.6] - 2025-10-21
+
+### Fixed
+- Fixed signal sensor unit of measurement warnings
+- Removed invalid device_class and unit for signal state sensors
+- Updated signal sensor to show state (0/1) instead of percentage
+
 ## [2.1.5] - 2025-10-21
 
 ### Fixed
